@@ -197,7 +197,7 @@ tiles = torch.ones([tiling_module.num_tiles(), 3] + tile_size)
 tiles = tiles * tile_colors
 ```
 
-<img src="./examples/without_masks_separate_tiles.jpg" width="500">
+<img src="https://github.com/ProGamerGov/blended-tiling/raw/main/examples/without_masks_separate_tiles.jpg" width="500">
 
 Next we apply the blend masks to the tiles:
 
@@ -205,7 +205,7 @@ Next we apply the blend masks to the tiles:
 tiles = tiles * tiling_module.get_tile_masks()
 ```
 
-<img src="./examples/with_masks_separate_tiles.jpg" width="500">
+<img src="https://github.com/ProGamerGov/blended-tiling/raw/main/examples/with_masks_separate_tiles.jpg" width="500">
 
 
 We can now combine the masked tiles into the full image:
@@ -215,7 +215,7 @@ We can now combine the masked tiles into the full image:
 output = tiling_module.rebuild(tiles)
 ```
 
-<img src="./examples/with_masks.jpg" width="500">
+<img src="https://github.com/ProGamerGov/blended-tiling/raw/main/examples/with_masks.jpg" width="500">
 
 We can also view the tile boundaries like so:
 
@@ -224,7 +224,7 @@ We can also view the tile boundaries like so:
 output = tiling_module.rebuild(tiles, border=2, colors=[0,0,0])
 ```
 
-<img src="./examples/with_masks_and_borders.jpg" width="500">
+<img src="https://github.com/ProGamerGov/blended-tiling/raw/main/examples/with_masks_and_borders.jpg" width="500">
 
 We can view an animation of the tiles being added like this:
 
