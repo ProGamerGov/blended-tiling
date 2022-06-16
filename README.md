@@ -1,9 +1,5 @@
 # blended-tiling
 
-<!--- BADGES: START --->
-[![GitHub - License](https://img.shields.io/github/license/progamergov/blended-tiling?logo=github&style=flat&color=green)][#github-license]
-<!--- BADGES: END --->
-
 This module adds support for splitting NCHW tensor inputs like images & activations into overlapping tiles of equal size, and then blending those overlapping tiles together after they have been altered. This module is also fully Autograd & JIT / TorchScript compatible.
 
 This tiling solution is intended for situations where one wishes to render / generate outputs that are larger than what their computing device can support. Tiles can be separately rendered and periodically blended together to maintain tile feature coherence. As part of maintaining tile feature coherence, all tiles have the same size.
