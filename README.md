@@ -2,7 +2,6 @@
 
 <!--- BADGES: START --->
 [![GitHub - License](https://img.shields.io/github/license/progamergov/blended-tiling?logo=github&style=flat&color=green)][#github-license]
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.000000.svg)](https://doi.org/10.5281/zenodo.000000)
 <!--- BADGES: END --->
 
 This module adds support for splitting NCHW tensor inputs like images & activations into overlapping tiles of equal size, and then blending those overlapping tiles together after they have been altered. This module is also fully Autograd & JIT / TorchScript compatible.
@@ -249,4 +248,4 @@ tile_frames[0].save(
 )
 ```
 
-<img src="./examples/with_masks.gif" width="500">
+<img src="https://github.com/ProGamerGov/blended-tiling/raw/main/examples/with_masks.gif" width="500">
