@@ -191,7 +191,7 @@ class TilingModule(torch.nn.Module):
         return tiles, [y_coords, x_coords], [y_overlaps, x_overlaps]
 
     def _create_mask_part(
-        self, shape: List[int], overlap: List[int], device: torch.device
+        self, shape: List[int], overlap: List[int], device: torch.device, dtype: torch.dtype = torch.float
     ) -> torch.Tensor:
         """
         Create part of a mask for a specified side.
@@ -210,9 +210,9 @@ class TilingModule(torch.nn.Module):
         ones_size = shape[3] - (zeros_size + lin_size)
         sizes = (zeros_size, lin_size, ones_size)
         mask_parts = [
-            torch.zeros(sizes[0], device=device, dtype=torch.float),
-            torch.linspace(0, 1, sizes[1], device=device, dtype=torch.float),
-            torch.ones(sizes[2], device=device, dtype=torch.float),
+            torch.zeros(sizes[0], device=device, dtype=dtype),
+            torch.linspace(0, 1, sizes[1], device=device, dtype=dtype),
+            torch.ones(sizes[2], device=device, dtype=dtype),
         ]
         return (
             torch.cat(mask_parts, 0)
@@ -229,6 +229,7 @@ class TilingModule(torch.nn.Module):
         shape: List[int],
         ovlp: List[int],
         device: torch.device = torch.device("cpu"),
+        dtype: torch.dtype = torch.float,
     ) -> torch.Tensor:
         """
         Build individual tile masks.
@@ -268,6 +269,7 @@ class TilingModule(torch.nn.Module):
         self,
         tile_shape: List[int],
         device: torch.device = torch.device("cpu"),
+        dtype: torch.dtype = torch.float,
     ) -> torch.Tensor:
         """
         Args:
@@ -286,7 +288,7 @@ class TilingModule(torch.nn.Module):
         for column, y in enumerate(tile_coords[0]):
             for row, x in enumerate(tile_coords[1]):
                 tile_mask = torch.ones(
-                    [1] + list(tile_shape[1:]), device=device, dtype=torch.float
+                    [1] + list(tile_shape[1:]), device=device, dtype=dtype
                 )
 
                 # Vertical masking along H dim (Top & Bottom)
@@ -298,6 +300,7 @@ class TilingModule(torch.nn.Module):
                         shape=tile_shape[:2] + tile_shape[2:][::-1],
                         ovlp=tile_overlaps[0][column],
                         device=device,
+                        dtype=dtype,
                     )
                     tile_mask = tile_mask * tile_mask_h
 
@@ -310,6 +313,7 @@ class TilingModule(torch.nn.Module):
                         shape=tile_shape,
                         ovlp=tile_overlaps[1][row],
                         device=device,
+                        dtype=dtype,
                     )
                     tile_mask = tile_mask * tile_mask_w
 
@@ -374,7 +378,7 @@ class TilingModule(torch.nn.Module):
         h = tile_coords[0][len(tile_coords[0]) - 1] + tile_size[0]
         w = tile_coords[1][len(tile_coords[1]) - 1] + tile_size[1]
         base_tensor = torch.zeros(
-            1, tiles.shape[1], h, w, device=tiles.device, dtype=torch.float
+            1, tiles.shape[1], h, w, device=tiles.device, dtype=tiles.dtype
         )
 
         i = 0
