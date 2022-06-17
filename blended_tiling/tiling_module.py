@@ -5,6 +5,11 @@ import torch
 
 
 class TilingModule(torch.nn.Module):
+    """
+    This module can split NCHW tensors into overlapping tiles, and can blend them back
+    together.
+    """
+
     __constants__ = ["_tile_size", "_tile_overlap"]
 
     def __init__(
@@ -85,7 +90,10 @@ class TilingModule(torch.nn.Module):
 
     @torch.jit.export
     def get_tile_masks(
-        self, channels: int = 3, device: torch.device = torch.device("cpu")
+        self,
+        channels: int = 3,
+        device: torch.device = torch.device("cpu"),
+        dtype: torch.dtype = torch.float,
     ) -> torch.Tensor:
         """
         Args:
@@ -193,7 +201,11 @@ class TilingModule(torch.nn.Module):
         return tiles, [y_coords, x_coords], [y_overlaps, x_overlaps]
 
     def _create_mask_part(
-        self, shape: List[int], overlap: List[int], device: torch.device, dtype: torch.dtype = torch.float
+        self,
+        shape: List[int],
+        overlap: List[int],
+        device: torch.device,
+        dtype: torch.dtype = torch.float,
     ) -> torch.Tensor:
         """
         Create part of a mask for a specified side.
@@ -204,6 +216,8 @@ class TilingModule(torch.nn.Module):
             overlap (list of int): The amount of overlap being used.
             device (torch.device, optional): The desired device to create the mask on.
                 Default: torch.device("cpu")
+            dtype (torch.dtype, optional): The desired dtype to create the masks with.
+                Default: torch.float
 
         Returns:
             mask_part (torch.Tensor): The mask for the specified side.
@@ -246,23 +260,25 @@ class TilingModule(torch.nn.Module):
             overlap (list of int): A list of overlap values to use.
             device (torch.device, optional): The desired device to create the mask on.
                 Default: torch.device("cpu")
+            dtype (torch.dtype, optional): The desired dtype to create the masks with.
+                Default: torch.float
         """
         # Mask right / bottom side
         if position == 0:
-            mask = self._create_mask_part(shape, ovlp, device).rot90(
+            mask = self._create_mask_part(shape, ovlp, device, dtype).rot90(
                 rot_list[0], [2, 3]
             )
         # Mask left & right or top & bottom sides
         elif position > 0 and position < grid_dim - 1:
-            mask = self._create_mask_part(shape, ovlp, device).rot90(
+            mask = self._create_mask_part(shape, ovlp, device, dtype).rot90(
                 rot_list[0], [2, 3]
             )
-            mask = mask * self._create_mask_part(shape, ovlp, device).rot90(
+            mask = mask * self._create_mask_part(shape, ovlp, device, dtype).rot90(
                 rot_list[1], [2, 3]
             )
         # Mask left / top side
         else:
-            mask = self._create_mask_part(shape, ovlp, device).rot90(
+            mask = self._create_mask_part(shape, ovlp, device, dtype).rot90(
                 rot_list[1], [2, 3]
             )
         return mask
@@ -280,6 +296,8 @@ class TilingModule(torch.nn.Module):
                 format of: [1, channels, height, width].
             device (torch.device, optional): The desired device to create the mask on.
                 Default: torch.device("cpu")
+            dtype (torch.dtype, optional): The desired dtype to create the masks with.
+                Default: torch.float
 
         Returns:
             masks (torch.Tensor): A stack of tile masks.
@@ -432,7 +450,7 @@ class TilingModule(torch.nn.Module):
                 together.
         """
         assert x.dim() == 4
-        masks = self._create_tile_masks(list(x.shape), x.device)[: x.shape[0]]
+        masks = self._create_tile_masks(list(x.shape), x.device, x.dtype)[: x.shape[0]]
         return self.rebuild(x * masks, border, colors)
 
     @torch.jit.export
