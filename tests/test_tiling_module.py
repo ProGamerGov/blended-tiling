@@ -160,7 +160,7 @@ class TestTilingModule(BaseTest):
         output = tiling_module(x)
         self.assertTrue(output.is_cuda)
         self.assertEqual(list(output.shape), [num_tiles, 3] + tile_size)
-        assertTensorAlmostEqual(self, output, x, delta=0.0)
+        assertTensorAlmostEqual(self, output, x, delta=0.002)
 
     def test_forward_basic_square_manual(self) -> None:
         full_size = [512, 512]
@@ -351,6 +351,27 @@ class TestTilingModule(BaseTest):
         self.assertEqual(x.dtype, output.dtype)
         assertTensorAlmostEqual(self, output, torch.ones_like(output), delta=0.003)
 
+    def test_forward_basic_square_rebuild_dtype_float64_cuda(self) -> None:
+        if not torch.cuda.is_available():
+            raise unittest.SkipTest(
+                "Skipping basic forward float64 CUDA test due to not supporting CUDA."
+            )
+        full_size = [512, 512]
+        tile_size = [224, 224]
+        tile_overlap = [0.25, 0.25]
+        tiling_module = TilingModule(
+            tile_size=tile_size,
+            tile_overlap=tile_overlap,
+            base_size=full_size,
+        )
+
+        x = torch.ones([tiling_module.num_tiles(), 3] + tile_size, dtype=torch.float64)
+        output = tiling_module.rebuild_with_masks(x)
+        self.assertEqual(list(output.shape), [1, 3] + full_size)
+        self.assertTrue(output.is_cuda)
+        self.assertEqual(x.dtype, output.dtype)
+        assertTensorAlmostEqual(self, output, torch.ones_like(output), delta=0.003)
+
     def test_forward_basic_square_dtype_float16(self) -> None:
         if not torch.cuda.is_available():
             raise unittest.SkipTest(
@@ -371,7 +392,7 @@ class TestTilingModule(BaseTest):
         ).cuda()
         output = tiling_module(x)
         self.assertEqual(list(output.shape), [num_tiles, 3] + tile_size)
-        self.assertTrue(output._is_cuda)
+        self.assertTrue(output.is_cuda)
         assertTensorAlmostEqual(self, output, x, delta=0.003)
 
     def test_forward_basic_square_rebuild_dtype_float16(self) -> None:
@@ -394,5 +415,5 @@ class TestTilingModule(BaseTest):
         output = tiling_module.rebuild_with_masks(x)
         self.assertEqual(list(output.shape), [1, 3] + full_size)
         self.assertEqual(output.dtype, x.dtype)
-        self.assertTrue(output._is_cuda)
+        self.assertTrue(output.is_cuda)
         assertTensorAlmostEqual(self, output, torch.ones_like(output), delta=0.003)
