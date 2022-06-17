@@ -94,6 +94,8 @@ class TilingModule(torch.nn.Module):
                 Default: 3
             device (torch.device, optional): The desired device to create the masks on.
                 Default: torch.device("cpu")
+            dtype (torch.dtype, optional): The desired dtype to create the masks with.
+                Default: torch.float
 
         Returns:
             masks (torch.Tensor): A set of tile masks stacked across the batch
