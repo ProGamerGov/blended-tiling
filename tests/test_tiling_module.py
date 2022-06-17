@@ -345,7 +345,6 @@ class TestTilingModule(BaseTest):
             base_size=full_size,
         )
 
-        num_tiles = tiling_module.num_tiles()
         x = torch.ones([tiling_module.num_tiles(), 3] + tile_size, dtype=torch.float64)
         output = tiling_module.rebuild_with_masks(x)
         self.assertEqual(list(output.shape), [1, 3] + full_size)
@@ -367,7 +366,9 @@ class TestTilingModule(BaseTest):
         )
 
         num_tiles = tiling_module.num_tiles()
-        x = torch.ones([tiling_module.num_tiles(), 3] + tile_size, dtype=torch.float16).cuda()
+        x = torch.ones(
+            [tiling_module.num_tiles(), 3] + tile_size, dtype=torch.float16
+        ).cuda()
         output = tiling_module(x)
         self.assertEqual(list(output.shape), [num_tiles, 3] + tile_size)
         self.assertTrue(output._is_cuda)
@@ -387,8 +388,9 @@ class TestTilingModule(BaseTest):
             base_size=full_size,
         )
 
-        num_tiles = tiling_module.num_tiles()
-        x = torch.ones([tiling_module.num_tiles(), 3] + tile_size, dtype=torch.float16).cuda()
+        x = torch.ones(
+            [tiling_module.num_tiles(), 3] + tile_size, dtype=torch.float16
+        ).cuda()
         output = tiling_module.rebuild_with_masks(x)
         self.assertEqual(list(output.shape), [1, 3] + full_size)
         self.assertEqual(output.dtype, x.dtype)
