@@ -110,7 +110,7 @@ class TilingModule(torch.nn.Module):
                 dimension.
         """
         shape = [self._num_tiles, channels] + list(self._tile_size)
-        return self._create_tile_masks(shape, device)
+        return self._create_tile_masks(shape, device, dtype)
 
     def _calc_tile_coords(
         self, d: int, tile_dim: int, overlap: float = 0.0
