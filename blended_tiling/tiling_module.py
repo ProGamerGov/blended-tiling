@@ -127,7 +127,7 @@ class TilingModule(torch.nn.Module):
             coords (list of int): The starting and ending coords for each tile.
             overlap (list of list of int): The amount of overlap to use for each
                 tile edge, with a format of: [zeros_length, linspace_length] for
-                eacH item in the list.
+                each item in the list.
         """
         c, tile_start, coords, overlaps = (
             1,
