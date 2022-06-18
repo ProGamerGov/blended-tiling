@@ -305,7 +305,7 @@ class TilingModule(torch.nn.Module):
         Args:
 
             tile_shape (list of int): The shape of the tiles being used, in the
-                format of: [1, channels, height, width].
+                format of: [n_tiles, channels, height, width].
             device (torch.device, optional): The desired device to create the mask on.
                 Default: torch.device("cpu")
             dtype (torch.dtype, optional): The desired dtype to create the masks with.
