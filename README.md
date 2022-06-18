@@ -43,8 +43,8 @@ blended_tiling.TilingModule(tile_size=(224, 224), tile_overlap=(0.25, 0.25), bas
 
 **Initialization Variables**
 
-* `tile_size` (int or tuple of int): The size of tiles to use. A single integer to use for both the height and width dimensions, or a list / tuple of dimensions with a shape of: `[height, width]`.
-* `tile_overlap` (int or tuple of int): The amount of overlap to use when creating tiles. A single integer to use for both the height and width dimensions, or a list / tuple of dimensions with a shape of: `[height, width]`.
+* `tile_size` (int or tuple of int): The size of tiles to use. A single integer to use for both the height and width dimensions, or a list / tuple of dimensions with a shape of: `[height, width]`. The chosen tile sizes should be less than or equal to the sizes of the full image (`base_size`).
+* `tile_overlap` (int or tuple of int): The amount of overlap to use when creating tiles. A single integer to use for both the height and width dimensions, or a list / tuple of dimensions with a shape of: `[height, width]`. The chosen overlap percentages should be in the range `0.0` to `0.50` (0% - 50%).
 * `base_size` (int or tuple of int): The size of the NCHW tensor being split into tiles. A single integer to use for both the height and width dimensions, or a list / tuple of dimensions with a shape of: `[height, width]`.
 
 
