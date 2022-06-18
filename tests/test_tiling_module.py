@@ -349,10 +349,7 @@ class TestTilingModule(BaseTest):
         )
         self.assertEqual(list(output.shape), [1, 1] + full_size)
         self.assertEqual(output.dtype, x.dtype)
-        self.assertTrue(output.is_cuda)
-        assertTensorAlmostEqual(
-            self, output.mean(), torch.ones_like(output).mean(), delta=0.003
-        )
+        assertTensorAlmostEqual(self, output, expected_output, delta=0.003)
 
     def test_forward_basic_square_dtype_float64(self) -> None:
         full_size = [512, 512]
