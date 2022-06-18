@@ -127,7 +127,7 @@ class TilingModule(torch.nn.Module):
             coords (list of int): The starting and ending coords for each tile.
             overlap (list of list of int): The amount of overlap to use for each
                 tile edge, with a format of: [zeros_length, linspace_length] for
-                eahc item in the list.
+                eacH item in the list.
         """
         c, tile_start, coords, overlaps = (
             1,
@@ -215,7 +215,8 @@ class TilingModule(torch.nn.Module):
 
         Args:
 
-            shape (list of int): The shape of the tile mask being created.
+            shape (list of int): The shape of the tile mask being created, with a
+                format of: [1, C, H, W].
             overlap (list of int): The amount of overlap being used, with a format of:
                 [[zeros_length, linspace_length], ...]. These values are used to
                 calculate various the sizes of mask parts.
@@ -227,6 +228,7 @@ class TilingModule(torch.nn.Module):
         Returns:
             mask_part (torch.Tensor): The mask for the specified side.
         """
+        assert len(shape) == 4
         zeros_size, lin_size = overlap[0:2]
         ones_size = shape[3] - (zeros_size + lin_size)
         sizes = (zeros_size, lin_size, ones_size)
@@ -261,13 +263,18 @@ class TilingModule(torch.nn.Module):
             grid_dim (int): The number of tiles being used for the specified position.
             rot_list (list of int): The amount to rotate the mask so that it masks the
                 appropriate side. Expected format of: [right / bottom, left / top].
-            shape (list of int): The full size of the tile being masked.
-            overlap (list of int): A list of overlap values to use.
+            shape (list of int): The full size of the tile being masked, with a format
+                of: [1, C, H, W].
+            overlap (list of int): The amount of overlap being used, with a format of:
+                [[zeros_length, linspace_length], ...]. These values are used to
+                calculate various the sizes of mask parts.
             device (torch.device, optional): The desired device to create the mask on.
                 Default: torch.device("cpu")
             dtype (torch.dtype, optional): The desired dtype to create the masks with.
                 Default: torch.float
         """
+        assert len(shape) == 4
+
         # Mask right / bottom side
         if position == 0:
             mask = self._create_mask_part(shape, ovlp, device, dtype).rot90(
