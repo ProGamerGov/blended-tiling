@@ -65,11 +65,12 @@ blended_tiling.TilingModule(tile_size=(224, 224), tile_overlap=(0.25, 0.25), bas
   * Returns:
     * `tiles` (torch.Tensor): A set of tiles created from the input image.
 
-**`get_tile_masks(channels=3, device=torch.device("cpu"))`**: Return a stack of NCHW masks corresponding to the tiles outputted by `.split_into_tiles(x)`.
+**`get_tile_masks(channels=3, device=torch.device("cpu"), dtype=torch.float)`**: Return a stack of NCHW masks corresponding to the tiles outputted by `.split_into_tiles(x)`.
 
   * Variables:
     * `channels` (int, optional): The number of channels to use for the masks. Default: 3
     * `device` (torch.device, optional): The desired device to create the masks on. Default: torch.device("cpu")
+    * `dtype` (torch.dtype, optional): The desired dtype to create the masks with. Default: torch.float
   * Returns:
     * `masks` (torch.Tensor): A set of tile masks stacked across the batch dimension.
 
