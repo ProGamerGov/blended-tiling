@@ -98,6 +98,8 @@ blended_tiling.TilingModule(tile_size=(224, 224), tile_overlap=(0.25, 0.25), bas
     * `x` (torch.Tensor): A set of tiles with overlapping regions blended together.
 
 
+### Supported Tensor Types
+
 The `TilingModule` class has been tested with and is confirmed to work with the following PyTorch [Tensor Data types / dtypes](https://pytorch.org/docs/stable/tensors.html): `torch.float32` / `torch.float`, `torch.float64` / `torch.double`, `torch.float16` / `torch.half`, & `torch.bfloat16`.
 
 
