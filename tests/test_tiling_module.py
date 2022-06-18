@@ -423,3 +423,55 @@ class TestTilingModule(BaseTest):
         assertTensorAlmostEqual(
             self, output.mean(), torch.ones_like(output).mean(), delta=0.003
         )
+
+    def test_forward_basic_square_dtype_bfloat16(self) -> None:
+        if not torch.cuda.is_available():
+            raise unittest.SkipTest(
+                "Skipping basic forward bfloat16 CUDA test due to not supporting"
+                + " CUDA."
+            )
+        full_size = [512, 512]
+        tile_size = [224, 224]
+        tile_overlap = [0.25, 0.25]
+        tiling_module = TilingModule(
+            tile_size=tile_size,
+            tile_overlap=tile_overlap,
+            base_size=full_size,
+        )
+
+        num_tiles = tiling_module.num_tiles()
+        x = torch.ones(
+            [tiling_module.num_tiles(), 3] + tile_size, dtype=torch.bfloat16
+        ).cuda()
+        output = tiling_module(x)
+        self.assertEqual(list(output.shape), [num_tiles, 3] + tile_size)
+        self.assertTrue(output.is_cuda)
+        assertTensorAlmostEqual(
+            self, output.mean(), torch.ones_like(output).mean(), delta=0.003
+        )
+
+    def test_forward_basic_square_rebuild_dtype_bfloat16(self) -> None:
+        if not torch.cuda.is_available():
+            raise unittest.SkipTest(
+                "Skipping basic forward bfloat16 CUDA test due to not supporting"
+                + " CUDA."
+            )
+        full_size = [512, 512]
+        tile_size = [224, 224]
+        tile_overlap = [0.25, 0.25]
+        tiling_module = TilingModule(
+            tile_size=tile_size,
+            tile_overlap=tile_overlap,
+            base_size=full_size,
+        )
+
+        x = torch.ones(
+            [tiling_module.num_tiles(), 3] + tile_size, dtype=torch.bfloat16
+        ).cuda()
+        output = tiling_module.rebuild_with_masks(x)
+        self.assertEqual(list(output.shape), [1, 3] + full_size)
+        self.assertEqual(output.dtype, x.dtype)
+        self.assertTrue(output.is_cuda)
+        assertTensorAlmostEqual(
+            self, output.mean(), torch.ones_like(output).mean(), delta=0.003
+        )
