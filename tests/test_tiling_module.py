@@ -373,6 +373,70 @@ class TestTilingModule(BaseTest):
         self.assertEqual(output.dtype, x.dtype)
         assertTensorAlmostEqual(self, output, expected_output, delta=0.003)
 
+    def test_forward_basic_square_rebuild_with_masks_less_tiles_1_4(self) -> None:
+        full_size = [8, 8]
+        tile_size = [5, 5]
+        tile_overlap = [0.25, 0.25]
+        tiling_module = TilingModule(
+            tile_size=tile_size,
+            tile_overlap=tile_overlap,
+            base_size=full_size,
+        )
+        x = torch.ones([tiling_module.num_tiles() - 3, 1] + tile_size)
+        output = tiling_module.rebuild_with_masks(x.clone(), border=1)
+        expected_output = torch.tensor(
+            [
+                [
+                    [
+                        [1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0],
+                        [1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0],
+                        [1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0],
+                        [1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0],
+                        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                        [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                    ]
+                ]
+            ]
+        )
+        self.assertEqual(list(output.shape), [1, 1] + full_size)
+        self.assertEqual(output.dtype, x.dtype)
+        assertTensorAlmostEqual(self, output, expected_output, delta=0.003)
+
+    def test_forward_basic_square_rebuild_with_masks_less_tiles_3_4(self) -> None:
+        full_size = [8, 8]
+        tile_size = [5, 5]
+        tile_overlap = [0.25, 0.25]
+        tiling_module = TilingModule(
+            tile_size=tile_size,
+            tile_overlap=tile_overlap,
+            base_size=full_size,
+        )
+
+        x = torch.ones([tiling_module.num_tiles() - 1, 1] + tile_size)
+        output = tiling_module.rebuild_with_masks(x.clone(), border=1)
+
+        expected_output = torch.tensor(
+            [
+                [
+                    [
+                        [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                        [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                        [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                        [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+                        [1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0],
+                        [1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0],
+                        [1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0],
+                        [1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0],
+                    ]
+                ]
+            ]
+        )
+        self.assertEqual(list(output.shape), [1, 1] + full_size)
+        self.assertEqual(output.dtype, x.dtype)
+        assertTensorAlmostEqual(self, output, expected_output, delta=0.003)
+
     def test_forward_basic_square_dtype_float64(self) -> None:
         full_size = [512, 512]
         tile_size = [224, 224]
