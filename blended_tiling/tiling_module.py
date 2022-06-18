@@ -354,8 +354,11 @@ class TilingModule(torch.nn.Module):
             x (torch.Tensor) A tile to add a border to.
             border (int, optional): The size of border to use.
                 Default: 1
-            colors (list of float, optional): A set of floats for each image channel
-                to use for the border color.
+            colors (list of float, optional): A set of floats to use for the border
+                color. The number of floats should correspond to the number of
+                channels in the NCHW tensor. Default is set to None for a 3 channel
+                RGB red color: [1.0, 0.0, 0.0].
+                Default: None
         """
         colors = colors if colors is not None else [1.0, 0.0, 0.0]
         assert x.dim() == 4 and x.shape[1] == len(colors) and border > 0
@@ -384,7 +387,9 @@ class TilingModule(torch.nn.Module):
                 Set to None for no border.
                 Default: None
             colors (list of float, optional): A set of floats to use for the border
-                color, if using borders.
+                color, if using borders. The number of floats should correspond to the
+                number of channels in the NCHW tensor. Default is set to None for a 3
+                channel RGB red color: [1.0, 0.0, 0.0].
                 Default: None
 
         Returns:
@@ -442,7 +447,9 @@ class TilingModule(torch.nn.Module):
                 Set to None for no border.
                 Default: None
             colors (list of float, optional): A set of floats to use for the border
-                color, if using borders.
+                color, if using borders. The number of floats should correspond to the
+                number of channels in the NCHW tensor. Default is set to None for a 3
+                channel RGB red color: [1.0, 0.0, 0.0].
                 Default: None
 
         Returns:
