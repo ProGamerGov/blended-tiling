@@ -122,6 +122,7 @@ class TestTilingModule(BaseTest):
         x = torch.ones([num_tiles, 3] + tile_size)
         output = tiling_module(x)
         self.assertEqual(list(output.shape), [num_tiles, 3] + tile_size)
+        self.assertEqual(output.dtype, x.dtype)
         assertTensorAlmostEqual(self, output, x, delta=0.0)
 
     def test_forward_basic_square_jit_module(self) -> None:
@@ -317,6 +318,41 @@ class TestTilingModule(BaseTest):
         output = tiling_module.rebuild_with_masks(x)
         self.assertEqual(list(output.shape), [1, 3] + full_size)
         assertTensorAlmostEqual(self, torch.ones_like(output), output, delta=0.003)
+
+    def test_forward_basic_square_rebuild_with_masks_border(self) -> None:
+        full_size = [8, 8]
+        tile_size = [5, 5]
+        tile_overlap = [0.25, 0.25]
+        tiling_module = TilingModule(
+            tile_size=tile_size,
+            tile_overlap=tile_overlap,
+            base_size=full_size,
+        )
+        x = torch.ones([tiling_module.num_tiles(), 1] + tile_size)
+        output = tiling_module.rebuild_with_masks(x, border=1, colors=[-5.0])
+
+        expected_output = torch.tensor(
+            [
+                [
+                    [
+                        [-5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0],
+                        [-5.0, 1.0, 1.0, -5.0, -5.0, 1.0, 1.0, -5.0],
+                        [-5.0, 1.0, 1.0, -5.0, -5.0, 1.0, 1.0, -5.0],
+                        [-5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0],
+                        [-5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0],
+                        [-5.0, 1.0, 1.0, -5.0, -5.0, 1.0, 1.0, -5.0],
+                        [-5.0, 1.0, 1.0, -5.0, -5.0, 1.0, 1.0, -5.0],
+                        [-5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0, -5.0],
+                    ]
+                ]
+            ]
+        )
+        self.assertEqual(list(output.shape), [1, 1] + full_size)
+        self.assertEqual(output.dtype, x.dtype)
+        self.assertTrue(output.is_cuda)
+        assertTensorAlmostEqual(
+            self, output.mean(), torch.ones_like(output).mean(), delta=0.003
+        )
 
     def test_forward_basic_square_dtype_float64(self) -> None:
         full_size = [512, 512]
