@@ -125,8 +125,9 @@ class TilingModule(torch.nn.Module):
 
         Returns:
             coords (list of int): The starting and ending coords for each tile.
-            overlap (list of lust of int): The amount of overlap to use for each
-                tile edge.
+            overlap (list of list of int): The amount of overlap to use for each
+                tile edge, with a format of: [zeros_length, linspace_length] for
+                each item in the list.
         """
         c, tile_start, coords, overlaps = (
             1,
@@ -175,9 +176,11 @@ class TilingModule(torch.nn.Module):
             tiles (torch.Tensor): A set of NCHW tiles created from the input tensor,
                 stacked across the batch dimension.
             coords (list of list of int): Sets of x and y coordinates corresponding
-                to each tile.
+                to each tile, with a format of: [y_coords, x_coords].
             overlaps (list of list of list of int): Sets of x and y overlaps
-                corresponding to each tile / set of coordinates.
+                corresponding to each tile / set of coordinates, with a format of:
+                [[[y_zeros, y_linspace], ...], [[x_zeros, x_linspace], ...]]. These
+                values are then used for creating the tile masks used for blending.
         """
         assert tensor.dim() == 4 and tensor.shape[0] == 1
 
@@ -212,8 +215,11 @@ class TilingModule(torch.nn.Module):
 
         Args:
 
-            shape (list of int): The shape of the tile mask being created.
-            overlap (list of int): The amount of overlap being used.
+            shape (list of int): The shape of the tile mask being created, with a
+                format of: [1, C, H, W].
+            overlap (list of int): The amount of overlap being used, with a format of:
+                [[zeros_length, linspace_length], ...]. These values are used to
+                calculate various the sizes of mask parts.
             device (torch.device, optional): The desired device to create the mask on.
                 Default: torch.device("cpu")
             dtype (torch.dtype, optional): The desired dtype to create the masks with.
@@ -222,6 +228,7 @@ class TilingModule(torch.nn.Module):
         Returns:
             mask_part (torch.Tensor): The mask for the specified side.
         """
+        assert len(shape) == 4
         zeros_size, lin_size = overlap[0:2]
         ones_size = shape[3] - (zeros_size + lin_size)
         sizes = (zeros_size, lin_size, ones_size)
@@ -255,14 +262,19 @@ class TilingModule(torch.nn.Module):
             position (int): The dimension being masked.
             grid_dim (int): The number of tiles being used for the specified position.
             rot_list (list of int): The amount to rotate the mask so that it masks the
-                appropriate side.
-            shape (list of int): The full size of the tile being masked.
-            overlap (list of int): A list of overlap values to use.
+                appropriate side. Expected format of: [right / bottom, left / top].
+            shape (list of int): The full size of the tile being masked, with a format
+                of: [1, C, H, W].
+            overlap (list of int): The amount of overlap being used, with a format of:
+                [[zeros_length, linspace_length], ...]. These values are used to
+                calculate various the sizes of mask parts.
             device (torch.device, optional): The desired device to create the mask on.
                 Default: torch.device("cpu")
             dtype (torch.dtype, optional): The desired dtype to create the masks with.
                 Default: torch.float
         """
+        assert len(shape) == 4
+
         # Mask right / bottom side
         if position == 0:
             mask = self._create_mask_part(shape, ovlp, device, dtype).rot90(
@@ -293,7 +305,7 @@ class TilingModule(torch.nn.Module):
         Args:
 
             tile_shape (list of int): The shape of the tiles being used, in the
-                format of: [1, channels, height, width].
+                format of: [n_tiles, channels, height, width].
             device (torch.device, optional): The desired device to create the mask on.
                 Default: torch.device("cpu")
             dtype (torch.dtype, optional): The desired dtype to create the masks with.
@@ -354,8 +366,11 @@ class TilingModule(torch.nn.Module):
             x (torch.Tensor) A tile to add a border to.
             border (int, optional): The size of border to use.
                 Default: 1
-            colors (list of float, optional): A set of floats for each image channel
-                to use for the border color.
+            colors (list of float, optional): A set of floats to use for the border
+                color. The number of floats should correspond to the number of
+                channels in the NCHW tensor. Default is set to None for a 3 channel
+                RGB red color: [1.0, 0.0, 0.0].
+                Default: None
         """
         colors = colors if colors is not None else [1.0, 0.0, 0.0]
         assert x.dim() == 4 and x.shape[1] == len(colors) and border > 0
@@ -384,7 +399,9 @@ class TilingModule(torch.nn.Module):
                 Set to None for no border.
                 Default: None
             colors (list of float, optional): A set of floats to use for the border
-                color, if using borders.
+                color, if using borders. The number of floats should correspond to the
+                number of channels in the NCHW tensor. Default is set to None for a 3
+                channel RGB red color: [1.0, 0.0, 0.0].
                 Default: None
 
         Returns:
@@ -442,7 +459,9 @@ class TilingModule(torch.nn.Module):
                 Set to None for no border.
                 Default: None
             colors (list of float, optional): A set of floats to use for the border
-                color, if using borders.
+                color, if using borders. The number of floats should correspond to the
+                number of channels in the NCHW tensor. Default is set to None for a 3
+                channel RGB red color: [1.0, 0.0, 0.0].
                 Default: None
 
         Returns:

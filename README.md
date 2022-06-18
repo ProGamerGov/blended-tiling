@@ -43,8 +43,8 @@ blended_tiling.TilingModule(tile_size=(224, 224), tile_overlap=(0.25, 0.25), bas
 
 **Initialization Variables**
 
-* `tile_size` (int or tuple of int): The size of tiles to use. A single integer to use for both the height and width dimensions, or a list / tuple of dimensions with a shape of: `[height, width]`.
-* `tile_overlap` (int or tuple of int): The amount of overlap to use when creating tiles. A single integer to use for both the height and width dimensions, or a list / tuple of dimensions with a shape of: `[height, width]`.
+* `tile_size` (int or tuple of int): The size of tiles to use. A single integer to use for both the height and width dimensions, or a list / tuple of dimensions with a shape of: `[height, width]`. The chosen tile sizes should be less than or equal to the sizes of the full NCHW tensor (`base_size`).
+* `tile_overlap` (int or tuple of int): The amount of overlap to use when creating tiles. A single integer to use for both the height and width dimensions, or a list / tuple of dimensions with a shape of: `[height, width]`. The chosen overlap percentages should be in the range [0.0, 0.50] (0% - 50%).
 * `base_size` (int or tuple of int): The size of the NCHW tensor being split into tiles. A single integer to use for both the height and width dimensions, or a list / tuple of dimensions with a shape of: `[height, width]`.
 
 
@@ -65,11 +65,12 @@ blended_tiling.TilingModule(tile_size=(224, 224), tile_overlap=(0.25, 0.25), bas
   * Returns:
     * `tiles` (torch.Tensor): A set of tiles created from the input image.
 
-**`get_tile_masks(channels=3, device=torch.device("cpu"))`**: Return a stack of NCHW masks corresponding to the tiles outputted by `.split_into_tiles(x)`.
+**`get_tile_masks(channels=3, device=torch.device("cpu"), dtype=torch.float)`**: Return a stack of NCHW masks corresponding to the tiles outputted by `.split_into_tiles(x)`.
 
   * Variables:
     * `channels` (int, optional): The number of channels to use for the masks. Default: 3
     * `device` (torch.device, optional): The desired device to create the masks on. Default: torch.device("cpu")
+    * `dtype` (torch.dtype, optional): The desired dtype to create the masks with. Default: torch.float
   * Returns:
     * `masks` (torch.Tensor): A set of tile masks stacked across the batch dimension.
 
@@ -95,6 +96,11 @@ blended_tiling.TilingModule(tile_size=(224, 224), tile_overlap=(0.25, 0.25), bas
     * `x` (torch.Tensor): A set of tiles to blend the overlapping regions together of.
   * Returns:
     * `x` (torch.Tensor): A set of tiles with overlapping regions blended together.
+
+
+### Supported Tensor Types
+
+The `TilingModule` class has been tested with and is confirmed to work with the following PyTorch [Tensor Data types / dtypes](https://pytorch.org/docs/stable/tensors.html): `torch.float32` / `torch.float`, `torch.float64` / `torch.double`, `torch.float16` / `torch.half`, & `torch.bfloat16`.
 
 
 ## Usage
