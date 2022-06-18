@@ -76,6 +76,24 @@ class TestTilingModule(BaseTest):
         self.assertEqual(tiling_module.num_tiles(), 9)
         self.assertEqual(tiling_module.tiling_pattern(), [3, 3])
 
+    def test_calc_tile_coords_1(self) -> None:
+        tiling_module = TilingModule()
+        tile_dim=224
+        full_dim=512
+        overlap=0.5
+        coords, overlaps = tiling_module._calc_tile_coords(d=full_dim, tile_dim=tile_dim, overlap=overlap)
+        self.assertEqual(coords, [0, 112, 224, 288])
+        self.assertEqual(overlaps, [[0, 112], [0, 112], [0, 112], [48, 112]])
+
+    def test_calc_tile_coords_2(self) -> None:
+        tiling_module = TilingModule()
+        tile_dim=112
+        full_dim=224
+        overlap=0.15
+        coords, overlaps = tiling_module._calc_tile_coords(d=full_dim, tile_dim=tile_dim, overlap=overlap)
+        self.assertEqual(coords, [0, 95, 112])
+        self.assertEqual(overlaps, [[0, 17], [0, 17], [78, 17]])
+
     def test_forward_basic_square(self) -> None:
         full_size = [512, 512]
         tile_size = [224, 224]
