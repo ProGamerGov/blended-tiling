@@ -1,6 +1,12 @@
 # blended-tiling
 
+[![GitHub - License](https://img.shields.io/github/license/progamergov/blended-tiling?logo=github&style=flat&color=green)][#github-license]
+[![PyPI](https://img.shields.io/pypi/v/blended-tiling.svg)][#pypi-package]
 [![DOI](https://zenodo.org/badge/503953108.svg)](https://zenodo.org/badge/latestdoi/503953108)
+
+[#github-license]: https://github.com/progamergov/blended-tiling/blob/main/LICENSE
+[#pypi-package]: https://pypi.org/project/blended-tiling/
+
 
 This module adds support for splitting NCHW tensor inputs like images & activations into overlapping tiles of equal size, and then blending those overlapping tiles together after they have been altered. This module is also fully Autograd & JIT / TorchScript compatible.
 
