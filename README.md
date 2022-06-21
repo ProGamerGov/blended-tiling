@@ -167,7 +167,7 @@ print("{}x{}".format(tiling_pattern[0], tiling_pattern[1]))
 It's also easy to modify the forward function of the tiling module:
 
 ```
-from typing import Union, List, Tuple, cast
+from typing import Union, List, Tuple
 from blended_tiling import TilingModule
 
 class CustomTilingModule(TilingModule):
@@ -177,7 +177,7 @@ class CustomTilingModule(TilingModule):
         tile_overlap: Union[float, List[float], Tuple[float, float]] = [0.25, 0.25],
         base_size: Union[int, List[int], Tuple[int, int]] = [512, 512],
     ) -> None:
-        TilingModule.__init__(tile_size, tile_overlap, base_size)
+        TilingModule.__init__(self, tile_size, tile_overlap, base_size)
         self.custom_module = torch.nn.Identity()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -185,7 +185,6 @@ class CustomTilingModule(TilingModule):
         x = self.custom_module(x)
         return self._get_tiles_and_coords(full_tensor)[0]
 ```
-
 
 
 ## Examples
