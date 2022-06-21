@@ -611,8 +611,8 @@ class TestTilingModule(BaseTest):
                 self.custom_module = torch.nn.Identity()
 
             def forward(self, x: torch.Tensor) -> torch.Tensor:
-                full_tensor = self.rebuild_with_masks(x)
-                full_tensor = self.custom_module(full_tensor) + 4.0
+                x = self.rebuild_with_masks(x)
+                x = self.custom_module(x) + 4.0
                 return self._get_tiles_and_coords(full_tensor)[0]
 
         tiling_module = CustomTilingModule(
