@@ -3,7 +3,7 @@ authors:
   - family-names: Egan
     given-names: Ben
 cff-version: 1.2.0
-date-released: "2022-06-18"
+date-released: "2022-06-22"
 identifiers:
   - description: "This is the collection of archived snapshots of all versions of blended-tiling"
     type: doi
@@ -15,4 +15,4 @@ license: MIT
 message: "If you use this software, please cite it using these metadata."
 repository-code: "https://github.com/ProGamerGov/blended-tiling"
 title: "Blended-Tiling"
-version: 0.0.1-dev.5
+version: 0.0.1-dev.6
