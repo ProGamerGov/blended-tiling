@@ -594,3 +594,36 @@ class TestTilingModule(BaseTest):
         assertTensorAlmostEqual(
             self, output.mean(), torch.ones_like(output).mean(), delta=0.003
         )
+
+    def test_forward_basic_square_custom_inheritance(self) -> None:
+        full_size = [512, 512]
+        tile_size = [224, 224]
+        tile_overlap = [0.25, 0.25]
+
+        class CustomTilingModule(TilingModule):
+            def __init__(
+                self,
+                tile_size = [224, 224],
+                tile_overlap = [0.25, 0.25],
+                base_size = [512, 512],
+            ) -> None:
+                TilingModule.__init__(self, tile_size, tile_overlap, base_size)
+                self.custom_module = torch.nn.Identity()
+
+            def forward(self, x: torch.Tensor) -> torch.Tensor:
+                x = self.rebuild_with_masks(x)
+                x = self.custom_module(x) + 4.0
+                return self._get_tiles_and_coords(full_tensor)[0]
+
+        tiling_module = CustomTilingModule(
+            tile_size=tile_size,
+            tile_overlap=tile_overlap,
+            base_size=full_size,
+        )
+
+        num_tiles = tiling_module.num_tiles()
+        x = torch.ones([tiling_module.num_tiles(), 3] + tile_size)
+        output = tiling_module(x)
+
+        self.assertEqual(list(output.shape), [num_tiles, 3] + tile_size)
+        assertTensorAlmostEqual(self, output, x + 4.0, delta=0.003)
