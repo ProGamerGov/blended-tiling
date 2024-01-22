@@ -148,7 +148,7 @@ class TilingModule(torch.nn.Module):
                 i = len(coords) - 1
                 zeros_size = ((coords[i - 1] + tile_dim) - lin_size) - coords[i]
                 # Only use lin_mask for a row / column of 2 with equal overlap
-                if tile_dim > d / 2 and tile_dim != d:
+                if c == 1 and tile_dim > d / 2 and tile_dim != d:
                     lin_size = lin_size + zeros_size
                     zeros_size = 0
                 ovlp = [zeros_size, lin_size]
